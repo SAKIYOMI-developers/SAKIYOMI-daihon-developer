@@ -318,8 +318,6 @@ def generate_response_with_llm_for_multiple_namespaces(index, user_input, namesp
             "results_ns5": results.get('ns5', '情報なし'),
         })
 
-    print("LLMの応答:", response)
-
     return response
 
 # 競合他社の投稿タイトルのリストからオリジナルのタイトル候補を生成する関数
