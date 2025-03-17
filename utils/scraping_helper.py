@@ -121,6 +121,7 @@ def make_chunks_embeddings(chunks):
 
 ### pinecone処理
 def initialize_pinecone(pinecone_index_name, pinecone_api_key):
+    pinecone_index_name = pinecone_index_name.strip()
     pinecone = Pinecone(api_key=pinecone_api_key)
     index = pinecone.Index(pinecone_index_name)
     return index
