@@ -198,7 +198,7 @@ def main():
         with col1:
             user_input = st.text_area("生成指示 : 作りたいプロットのイメージを入力", value="""以下の内容で台本を書いてください。\nテーマ：\n\nターゲット：\n\nその他の指示：""", height=300)
             url = st.text_input("参考URL")
-            selected_llm = st.radio("LLMの選択", ("GPT-4o", "Claude3"))
+            selected_llm = st.radio("LLMの選択", ("o1", "Claude3"))
             submit_button = st.button('送信')
 
         if submit_button:
@@ -328,7 +328,7 @@ def main():
         with col1:
             with st.form("search_form"):
                 user_query = st.text_area("作りたい投稿ジャンルのキーワードやイメージを入力して下さい。", height=50)
-                selected_llm_title = st.radio("LLMの選択", ("GPT-4o", "Claude3"), key="radio_llm_selection_title")
+                selected_llm_title = st.radio("LLMの選択", ("o1", "Claude3"), key="radio_llm_selection_title")
                 submit_button = st.form_submit_button("テーマ提案")
 
         with col2:
