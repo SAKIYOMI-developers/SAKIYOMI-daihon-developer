@@ -34,6 +34,18 @@ apify_wcc_endpoint = st.secrets['website_content_crawler_endpoint']
 apifyapi_key = st.secrets['apifyapi_key']
 openai_api_key = st.secrets['OPENAI_API_KEY']
 
+# 開発環境かどうかをチェック（環境変数またはStreamlit設定から判断）
+def is_development_environment():
+    # 環境変数で判断する場合
+    if os.environ.get('ENVIRONMENT') == 'development':
+        return True
+    # Streamlit設定で判断する場合
+    try:
+        return st.secrets.get('environment', '').lower() == 'development'
+    except:
+        # デフォルトでは開発環境ではないと判断
+        return False
+
 #NG URLを判別する関数
 def is_ng_url(url):
     return any(ng_url in url for ng_url in ng_urls)
@@ -121,10 +133,41 @@ def make_chunks_embeddings(chunks):
 
 ### pinecone処理
 def initialize_pinecone(pinecone_index_name, pinecone_api_key):
-    pinecone = Pinecone(api_key=pinecone_api_key)
-    index = pinecone.Index(pinecone_index_name)
-    return index
-
+    try:
+        # まず提供されたAPIキーでPineconeを初期化
+        pinecone_client = Pinecone(api_key=pinecone_api_key)
+        index = pinecone_client.Index(pinecone_index_name)
+        # インデックスの状態をチェックして接続を確認
+        index.describe_index_stats()
+        return index
+    except Exception as e:
+        try:
+            # 最初の方法が失敗した場合、secrets.tomlからAPIキーを取得して再試行
+            logger.warning(f"提供されたPinecone APIキーでの初期化に失敗しました: {e}")
+            
+            # 開発環境でのみ警告を表示
+            if is_development_environment():
+                st.warning("提供されたPinecone APIキーでの接続に失敗しました。secrets.tomlからキーを取得して再試行します。")
+            
+            # secrets.tomlからPinecone APIキーを取得
+            pinecone_api_key_from_secrets = st.secrets.get('PINECONE_API_KEY')
+            
+            if not pinecone_api_key_from_secrets:
+                logger.error("secrets.tomlにPINECONE_API_KEYが設定されていません。")
+                st.error("Pineconeインデックスの初期化に失敗しました。有効なAPIキーを設定してください。")
+                raise ValueError("有効なPinecone APIキーが見つかりません")
+            
+            # 新しいキーでPineconeを初期化
+            pinecone_client = Pinecone(api_key=pinecone_api_key_from_secrets)
+            index = pinecone_client.Index(pinecone_index_name)
+            # インデックスの状態をチェックして接続を確認
+            index.describe_index_stats()
+            return index
+        except Exception as inner_e:
+            # どちらの方法も失敗した場合
+            logger.error(f"Pineconeインデックスの初期化に失敗しました: {inner_e}")
+            st.error("Pineconeインデックスの初期化に失敗しました。APIキーとインデックス名を確認してください。")
+            raise ValueError(f"Pineconeインデックスの初期化に失敗しました: {inner_e}")
 
 def store_data_in_pinecone(index, chunk_embeddings, chunks, metadata_list, namespace):
     # 最初のメタデータを使用（共通部分）
