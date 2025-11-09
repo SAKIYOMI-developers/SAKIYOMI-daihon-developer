@@ -40,7 +40,7 @@ def is_ng_url(url):
 
 # URLからコンテンツをスクレイピングする関数
 def scrape_url(url):
-    apify_client = ApifyClient('apify_api_akEVaWF0kZKZZT68WMUTvfrvOcAUjm436pIg')
+    apify_client = ApifyClient(st.secrets["apifyapi_key"])
     actor_call = apify_client.actor('apify/website-content-crawler').call(
         run_input={
             'startUrls': [{'url': url}],
