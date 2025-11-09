@@ -9,11 +9,11 @@ from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
 from PyPDF2 import PdfReader
 import langchain
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 import streamlit as st
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain.callbacks import tracing_v2_enabled
 from utils.example_prompt import system_prompt_example, system_prompt_title_reccomend_example
@@ -301,10 +301,10 @@ def generate_response_with_llm_for_multiple_namespaces(index, user_input, namesp
     prompt_template = PromptTemplate(template=system_prompt, input_variables=["user_input", "results_ns1", "results_ns2", "results_ns3", "results_ns4", "results_ns5"])
 
     # LLMの選択
-    if selected_llm == "o1":
-        llm = ChatOpenAI(model='o1', temperature=1.0)
+    if selected_llm == "GPT-5-mini":
+        llm = ChatOpenAI(model='gpt-5-mini', temperature=1.0)
     else:
-        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=1.0, max_tokens=3072)
+        llm = ChatAnthropic(model_name='claude-opus-4-0', temperature=1.0, max_tokens=3072)
 
     llm_chain = LLMChain(prompt=prompt_template, llm=llm)
 
@@ -323,10 +323,10 @@ def generate_response_with_llm_for_multiple_namespaces(index, user_input, namesp
 # 競合他社の投稿タイトルのリストからオリジナルのタイトル候補を生成する関数
 def generate_new_titles(user_query, competing_titles, selected_llm, system_prompt_title_reccomend):
     prompt_template = PromptTemplate(template=system_prompt_title_reccomend, input_variables=["user_query", "competing_titles"])
-    if selected_llm == "o1":
-        llm = ChatOpenAI(model='o1', temperature=1.0, max_completion_tokens=3072)
+    if selected_llm == "GPT-5-mini":
+        llm = ChatOpenAI(model='gpt-5-mini', temperature=1.0, max_completion_tokens=3072)
     else:
-        llm = ChatAnthropic(model_name='claude-3-5-sonnet-20240620', temperature=1.0, max_tokens=3072)
+        llm = ChatAnthropic(model_name='claude-opus-4-0', temperature=1.0, max_tokens=3072)
     llm_chain = LLMChain(prompt=prompt_template, llm=llm)
     response = llm_chain.run({
         "user_query": user_query,
