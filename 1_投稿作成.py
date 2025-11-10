@@ -9,24 +9,11 @@ from application.user_index_service import UserIndexService
 from application.prompt_service import PromptService
 from application.performance_service import PerformanceService
 from utils.example_prompt import system_prompt_example, system_prompt_title_reccomend_example
-from streamlit_pills import pills
 
 user_service = UserService()
 user_index_service = UserIndexService()
 prompt_service = PromptService()
 env = st.secrets.get("ENV", "")
-
-# インスタグラムのジャンルリストとアイコンを定義
-INSTAGRAM_GENRES = [
-    "ファッション", "美容", "グルメ", "旅行", "フィットネス", "ライフスタイル",
-    "インテリア", "ペット", "教育", "テクノロジー", "エンターテイメント", "ビジネス"
-]
-
-# ジャンルに対応するアイコン
-INSTAGRAM_ICONS = [
-    "👗", "💄", "🍽️", "✈️", "💪", "🌟",
-    "🏠", "🐾", "📚", "💻", "🎬", "💼"
-]
 
 def main():
     st.set_page_config(
@@ -206,21 +193,10 @@ def main():
     performance_service = PerformanceService(st.session_state['user_info']['localId'])
 
     with tab1:
-        # ジャンル選択のカプセル型セレクターを追加（アイコン付き）
-        st.subheader("ジャンルを選択")
-        selected_genre = pills("", INSTAGRAM_GENRES, INSTAGRAM_ICONS, key="plot_genre_pills")
-
-        # 選択されたジャンルをセッション状態に保存
-        if selected_genre:
-            st.session_state["selected_plot_genre"] = selected_genre
-
-        # 選択されたジャンルを表示用に取得
-        display_genre = st.session_state.get("selected_plot_genre", "")
-
         col1, col2 = st.columns(2)
 
         with col1:
-            user_input = st.text_area("生成指示 : 作りたいプロットのイメージを入力", value=f"""以下の内容で台本を書いてください。\nテーマ：\n\nターゲット：\n\nジャンル：{display_genre}\n\nその他の指示：""", height=300)
+            user_input = st.text_area("生成指示 : 作りたいプロットのイメージを入力", value="""以下の内容で台本を書いてください。\nテーマ：\n\nターゲット：\n\nその他の指示：""", height=300)
             url = st.text_input("参考URL")
             selected_llm = st.radio("LLMの選択", ("GPT-5-mini", "Claude4"))
             submit_button = st.button('送信')
@@ -348,22 +324,11 @@ def main():
 
     with tab3:
         st.header("投稿テーマ提案")
-
-        # ジャンル選択のカプセル型セレクターを追加（アイコン付き）
-        st.subheader("ジャンルを選択")
-        selected_theme_genre = pills("", INSTAGRAM_GENRES, INSTAGRAM_ICONS, key="theme_genre_pills")
-
-        # 選択されたジャンルをセッション状態に保存
-        if selected_theme_genre:
-            st.session_state["selected_theme_genre"] = selected_theme_genre
-
-        # 選択されたジャンルを表示用に取得
-        display_theme_genre = st.session_state.get("selected_theme_genre", "")
-
+        
         col1, col2 = st.columns(2)
         with col1:
             with st.form("search_form"):
-                user_query = st.text_area(f"作りたい投稿ジャンルのキーワードやイメージを入力して下さい。\n選択ジャンル: {display_theme_genre}", height=50)
+                user_query = st.text_area("作りたい投稿ジャンルのキーワードやイメージを入力して下さい。", height=50)
                 selected_llm_title = st.radio("LLMの選択", ("GPT-5-mini", "Claude4"), key="radio_llm_selection_title")
                 submit_button = st.form_submit_button("テーマ提案")
 
