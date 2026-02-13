@@ -21,6 +21,8 @@ class PromptService:
 
     def read_prompt(self, user_id: str, type: str) -> Dict[str, Any]:
         prompt = self.prompt_repo.read_prompt(user_id, type)
+        if prompt.get("status") == "error" or "data" not in prompt:
+            return prompt
         prompt["data"]["text"] = self.format_prompt(prompt["data"]["text"], prompt["data"]["example_plot"])
         return prompt
 
