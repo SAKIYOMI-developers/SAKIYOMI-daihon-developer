@@ -97,7 +97,7 @@ def edit_insight_sidebar():
 def get_ai_analysis(api_key, prompt, user_message):
     client = anthropic.Anthropic(api_key=api_key)
     message = client.messages.create(
-        model="claude-3-opus-20240229",
+        model="claude-sonnet-4-20250514",
         max_tokens=3000,
         temperature=0.7,
         system=prompt,
@@ -299,7 +299,8 @@ def main():
         if 'analysis_result' not in st.session_state:
             st.session_state.analysis_result = "分析結果がここに表示されます。"
 
-        st.text_area("AI分析結果", value=st.session_state.analysis_result, height=400, key="analysis_result")
+        st.subheader("AI分析結果")
+        st.markdown(st.session_state.analysis_result)
 
     except Exception as e:
         st.error(f"エラーが発生しました: {str(e)}")
